@@ -1,0 +1,53 @@
+module ALU(
+    input wire [9:0] S,             //Total Number of inputs
+    input wire clk,
+    input wire [1:0] Select
+);
+
+    logic [4:0] reg_a, reg_b;       //Register of input,output Block
+    logic [9:0] alu_result;
+
+    always_ff @(posedge clk) begin  //Always block for clk
+        reg_a <= S[4:0];
+        reg_b <= S[9:5];
+    end
+	 
+    cep my_cep(                     //Pointer for inputs,outputs
+        .num1(reg_a),
+        .num2(reg_b),
+        .operation(Select[1:0]),
+        .alu_out(alu_result)
+    );
+endmodule
+
+module cep(
+    input logic [4:0] num1,num2,   //5 bits inputs taken from the user     
+    input logic [1:0] operation,   //user's choice of operation to be performed
+    output logic [9:0] alu_out
+);
+    logic [9:0] choice; 
+                                    
+    function logic [9:0] multiply; //Coding block for Multiplication
+        input logic [4:0] a;
+        input logic [4:0] b;
+        logic [19:0] result;
+
+        result = 16'b0;
+        for (integer i = 0; i < 5; i = i + 1) begin
+            if (b[i] == 1) begin
+                result = result + (a << i);
+            end
+        end
+        multiply = result[9:0];
+    endfunction
+
+    always @(*) begin
+        case (operation)
+            2'b00: choice = num1 + num2; // Addition
+            2'b01: choice = num1 - num2; // Subtraction
+            2'b10: choice = multiply(num1, num2); // Multiplication
+            default: choice = 8'bxxxxxxxx;
+        endcase
+    end
+    assign alu_out = choice;
+endmodule
