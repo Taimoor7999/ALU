@@ -1,0 +1,2 @@
+We have taken input A as 1000 and input B as 0001 for DE1-SoC board.
+The quality of the pictures are a bit low.
